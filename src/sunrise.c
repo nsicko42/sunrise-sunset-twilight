@@ -439,8 +439,6 @@ hm_t __daylen__( int year, int month, int day, double lon, double lat,
 		else  t.r = (2.0/15.0) * acosd(cost); /* The diurnal arc, hours */
 	}
 
-	conv_time(t.r, &t.h, &t.m);
-
 	return t;
 }  /* __daylen__ */
 
