@@ -110,15 +110,13 @@ Released to the public domain by Paul Schlyter, December 1992
         __sunriset__( year, month, day, lon, lat, tz, -18.0, 0, start, end )
 
 
-typedef struct {double r; int h; int m;}hm_t;
-
 /* Function prototypes */
 
-hm_t __daylen__( int year, int month, int day, double lon, double lat,
+double __daylen__( int year, int month, int day, double lon, double lat,
                    double altit, int upper_limb );
 
 int __sunriset__( int year, int month, int day, double lon, double lat, double tz,
-                  double altit, int upper_limb, hm_t *rise, hm_t *set );
+                  double altit, int upper_limb, double *rise, double *set );
 
 void sunpos( double d, double *lon, double *r );
 
@@ -207,14 +205,14 @@ int main(int argc, char * argv[])
 	int year,month,day;
 	double lon, lat;
 	double tz;
-	hm_t daylen, civlen, nautlen, astrlen;
-	hm_t rise, set, civ_start, civ_end, naut_start, naut_end, astr_start, astr_end;
+	double daylen, civlen, nautlen, astrlen;
+	double rise, set, civ_start, civ_end, naut_start, naut_end, astr_start, astr_end;
 	int rs, civ, naut, astr;
 
 	parse_opts(argc, argv, &year, &month, &day, &lon, &lat, &tz);
 
-	printf("Longitude:       %c%.4lf\n", (lon<0)?'W':'E', (lon<0)?-lon:lon);
-	printf("Latitude:        %c%.4lf\n", (lat<0)?'S':'N', (lat<0)?-lat:lat);
+	printf("Longitude:       %c%.6lf\n", (lon<0)?'W':'E', (lon<0)?-lon:lon);
+	printf("Latitude:        %c%.6lf\n", (lat<0)?'S':'N', (lat<0)?-lat:lat);
 	printf("Date:            %d %02d %02d\n", year, month, day);
 	printf("Timezone:        %d\n", (int)tz);
 
@@ -223,25 +221,25 @@ int main(int argc, char * argv[])
 	nautlen = day_nautical_twilight_length(year,month,day,lon,lat);
 	astrlen = day_astronomical_twilight_length(year,month,day,lon,lat);
 
-	printf( "Day length:                 %02d:%02d\n", daylen.h, daylen.m);
-	printf( "With civil twilight         %02d:%02d\n", civlen.h, civlen.m);
-	printf( "With nautical twilight      %02d:%02d\n", nautlen.h, nautlen.m);
-	printf( "With astronomical twilight  %02d:%02d\n", astrlen.h, astrlen.m);
-	printf( "Length of twilight: civil   %02d:%02d\n", H((civlen.r-daylen.r)/2.0), M((civlen.r-daylen.r)/2.0));
-	printf( "                 nautical   %02d:%02d\n", H((nautlen.r-daylen.r)/2.0), M((nautlen.r-daylen.r)/2.0));
-	printf( "             astronomical   %02d:%02d\n", H((astrlen.r-daylen.r)/2.0), M((astrlen.r-daylen.r)/2.0));
+	printf( "With civil twilight         %02d:%02d\n", H(civlen), M(civlen));
+	printf( "Day length:                 %02d:%02d\n", H(daylen), M(daylen));
+	printf( "With nautical twilight      %02d:%02d\n", H(nautlen), M(nautlen));
+	printf( "With astronomical twilight  %02d:%02d\n", H(astrlen), M(astrlen));
+	printf( "Length of twilight: civil   %02d:%02d\n", H((civlen-daylen)/2.0), M((civlen-daylen)/2.0));
+	printf( "                 nautical   %02d:%02d\n", H((nautlen-daylen)/2.0), M((nautlen-daylen)/2.0));
+	printf( "             astronomical   %02d:%02d\n", H((astrlen-daylen)/2.0), M((astrlen-daylen)/2.0));
 
 	rs   = sun_rise_set         ( year, month, day, lon, lat, tz, &rise, &set );
 	civ  = civil_twilight       ( year, month, day, lon, lat, tz, &civ_start, &civ_end );
 	naut = nautical_twilight    ( year, month, day, lon, lat, tz, &naut_start, &naut_end );
 	astr = astronomical_twilight( year, month, day, lon, lat, tz, &astr_start, &astr_end );
 
-	printf( "Sun at south %02d:%02d\n", H((rise.r+set.r)/2.0), M((rise.r+set.r)/2.0));
+	printf( "Sun at south %02d:%02d\n", H((rise+set)/2.0), M((rise+set)/2.0));
 
 	switch( rs )
 	{
 		case 0:
-			printf( "Sun rises %02d:%02d, sets %02d:%02d\n", H(rise.r+tz), M(rise.r+tz), H(set.r+tz), M(set.r+tz));
+			printf( "Sun rises %02d:%02d, sets %02d:%02d\n", H(rise+tz), M(rise+tz), H(set+tz), M(set+tz));
 			break;
 		case +1:
 			printf( "Sun above horizon\n" );
@@ -254,7 +252,7 @@ int main(int argc, char * argv[])
 	switch( civ )
 	{
 		case 0:
-			printf( "Civil twilight starts %02d:%02d, ends %02d:%02d\n", H(civ_start.r+tz), M(civ_start.r+tz), H(civ_end.r+tz), M(civ_end.r+tz));
+			printf( "Civil twilight starts %02d:%02d, ends %02d:%02d\n", H(civ_start+tz), M(civ_start+tz), H(civ_end+tz), M(civ_end+tz));
 			break;
 		case +1:
 			printf( "Never darker than civil twilight\n" );
@@ -267,7 +265,7 @@ int main(int argc, char * argv[])
 	switch( naut )
 	{
 		case 0:
-			printf( "Nautical twilight starts %02d:%02d, ends %02d:%02d\n", H(naut_start.r+tz), M(naut_start.r+tz), H(naut_end.r+tz), M(naut_end.r+tz));
+			printf( "Nautical twilight starts %02d:%02d, ends %02d:%02d\n", H(naut_start+tz), M(naut_start+tz), H(naut_end+tz), M(naut_end+tz));
 			break;
 		case +1:
 			printf( "Never darker than nautical twilight\n" );
@@ -280,7 +278,7 @@ int main(int argc, char * argv[])
 	switch( astr )
 	{
 		case 0:
-			printf( "Astronomical twilight starts %02d:%02d, ends %02d:%02d\n", H(astr_start.r+tz), H(astr_start.r+tz), H(astr_end.r+tz), M(astr_end.r+tz));
+			printf( "Astronomical twilight starts %02d:%02d, ends %02d:%02d\n", H(astr_start+tz), H(astr_start+tz), H(astr_end+tz), M(astr_end+tz));
 			break;
 		case +1:
 			printf( "Never darker than astronomical twilight\n" );
@@ -295,7 +293,7 @@ int main(int argc, char * argv[])
 /* The "workhorse" function for sun rise/set times */
 
 int __sunriset__( int year, int month, int day, double lon, double lat, double tz,
-                  double altit, int upper_limb, hm_t *trise, hm_t *tset )
+                  double altit, int upper_limb, double *trise, double *tset )
 /***************************************************************************/
 /* Note: year,month,date = calendar date, 1801-2099 only.             */
 /*       Eastern longitude positive, Western longitude negative       */
@@ -369,8 +367,8 @@ int __sunriset__( int year, int month, int day, double lon, double lat, double t
 	}
 
 	/* Store rise and set times - in hours UT */
-	trise->r = tsouth - t;
-	tset->r  = tsouth + t;
+	*trise = tsouth - t;
+	*tset  = tsouth + t;
 
 	return rc;
 }  /* __sunriset__ */
@@ -380,7 +378,7 @@ int __sunriset__( int year, int month, int day, double lon, double lat, double t
 /* The "workhorse" function */
 
 
-hm_t __daylen__( int year, int month, int day, double lon, double lat,
+double __daylen__( int year, int month, int day, double lon, double lat,
                    double altit, int upper_limb )
 /**********************************************************************/
 /* Note: year,month,date = calendar date, 1801-2099 only.             */
@@ -405,7 +403,7 @@ hm_t __daylen__( int year, int month, int day, double lon, double lat,
 	sin_sdecl,  /* Sine of Sun's declination */
 	cos_sdecl,  /* Cosine of Sun's declination */
 	sradius;    /* Sun's apparent radius */
-	hm_t t;     /* Diurnal arc */
+	double t;     /* Diurnal arc */
 
 	/* Compute d of 12h local mean solar time */
 	d = days_since_2000_Jan_0(year,month,day) + 0.5 - lon/360.0;
@@ -433,10 +431,10 @@ hm_t __daylen__( int year, int month, int day, double lon, double lat,
 		cost = ( sind(altit) - sind(lat) * sin_sdecl ) /
 			( cosd(lat) * cos_sdecl );
 		if ( cost >= 1.0 )
-			t.r = 0.0;                      /* Sun always below altit */
+			t = 0.0;                      /* Sun always below altit */
 		else if ( cost <= -1.0 )
-			t.r = 24.0;                     /* Sun always above altit */
-		else  t.r = (2.0/15.0) * acosd(cost); /* The diurnal arc, hours */
+			t = 24.0;                     /* Sun always above altit */
+		else  t = (2.0/15.0) * acosd(cost); /* The diurnal arc, hours */
 	}
 
 	return t;
