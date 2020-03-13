@@ -151,8 +151,8 @@ static void print_usage(const char *prog)
              "  -m --mon      month (default today)\n"
              "  -d --day      day (default today)\n"
              "  -t --tz       time zone(default 9)\n"
-             "  -o --lon      longitude (default 127.076)\n"
-             "  -a --lat      latitude (default 37.152) \n"
+             "  -o --lon      longitude (default 126.978420)\n"
+             "  -a --lat      latitude (default 37.566692) \n"
              "  -h --help     this message\n");
         exit(1);
 }
@@ -166,8 +166,8 @@ static void parse_opts(int argc, char *argv[], int *y, int *m, int *d, double *l
   *y = now->tm_year + 1900;
   *m = now->tm_mon + 1;
   *d = now->tm_mday;
-  *lon = 127.076;
-  *lat = 37.152;
+  *lon = 126.978420;
+  *lat = 37.566692;
   *tz = 9;
 
   while(1)
