@@ -278,7 +278,7 @@ int main(int argc, char * argv[])
 	switch( astr )
 	{
 		case 0:
-			printf( "Astronomical twilight starts %02d:%02d, ends %02d:%02d\n", H(astr_start+tz), H(astr_start+tz), H(astr_end+tz), M(astr_end+tz));
+			printf( "Astronomical twilight starts %02d:%02d, ends %02d:%02d\n", H(astr_start+tz), M(astr_start+tz), H(astr_end+tz), M(astr_end+tz));
 			break;
 		case +1:
 			printf( "Never darker than astronomical twilight\n" );
