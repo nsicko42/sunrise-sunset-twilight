@@ -234,7 +234,7 @@ int main(int argc, char * argv[])
 	naut = nautical_twilight    ( year, month, day, lon, lat, tz, &naut_start, &naut_end );
 	astr = astronomical_twilight( year, month, day, lon, lat, tz, &astr_start, &astr_end );
 
-	printf( "Sun at south %02d:%02d\n", H((rise+set)/2.0), M((rise+set)/2.0));
+	printf( "Sun at south %02d:%02d\n", H((rise+tz+set+tz)/2.0), M((rise+tz+set+tz)/2.0));
 
 	switch( rs )
 	{
